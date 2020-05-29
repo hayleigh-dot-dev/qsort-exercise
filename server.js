@@ -14,7 +14,7 @@ socket.on('connection', ws => {
   clients[id] = ws
 
   ws.on('message', data => {
-    broadcast(data)
+    broadcast(data, ws)
   })
 
   ws.on('close', () => {
