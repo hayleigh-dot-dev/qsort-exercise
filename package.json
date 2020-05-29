@@ -1,0 +1,32 @@
+{
+  "name": "qsort-exercise",
+  "version": "1.0.0",
+  "engines": {
+    "node": "12.x"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "parcel src/index.html",
+    "build:prod": "parcel build src/index.html --public-url /programming-practice-questionnaire/ --no-source-maps --no-content-hash",
+    "deploy": "npm run build:prod && npx gh-pages -d dist -b master"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@fullhuman/postcss-purgecss": "^2.2.0",
+    "autoprefixer": "^9.8.0",
+    "elm-hot": "^1.1.4",
+    "gh-pages": "^2.2.0",
+    "node-elm-compiler": "^5.0.4",
+    "tailwindcss": "^1.4.6"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "ws": "^7.3.0"
+  },
+  "staticFiles": {
+    "staticPath": "assets",
+    "watcherGlob": "**"
+  }
+}

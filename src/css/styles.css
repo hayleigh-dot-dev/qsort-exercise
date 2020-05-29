@@ -1,0 +1,28 @@
+/* purgecss start ignore */
+:root {
+  --statement-width: 30vw;
+}
+
+section[data-likert="3"] > .container >  ul > li {
+  display: grid;
+  grid-template-columns: var(--statement-width) repeat(3, 1fr);
+}
+
+section[data-likert="5"] > .container > ul > li {
+  display: grid;
+  grid-template-columns: var(--statement-width) repeat(5, 1fr);
+}
+
+section[data-likert="7"] > .container >  ul > li {
+  display: grid;
+  grid-template-columns: var(--statement-width) repeat(7, 1fr);
+}
+
+section[data-q-sort="basic"] > .container {
+
+}
+
+section[data-q-sort="normal"] > .container {
+
+}
+/* purgecss end ignore */

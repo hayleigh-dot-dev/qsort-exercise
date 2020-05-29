@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <script>
+      const env = process.env.NODE_ENV
+      const tag = document.querySelector('head > script')
+
+      const baseUrl = env == 'production'
+        ? 'https://pd-andy.github.io/programming-practice-questionnaire/'
+        : 'http://localhost:1234/'
+
+      tag.insertAdjacentHTML('afterend', `<base href="${baseUrl}">`)
+    </script>
+
+    <link rel="stylesheet" href="css/tailwind.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <script defer src="main.js"></script>
+  </head>
+
+  <body class="py-4 container mx-auto">
+    <div>
+      <noscript>
+        Put something in here web crawlers that don't use javascript!
+      </noscript>
+    </div>
+  </body>
+</html>
