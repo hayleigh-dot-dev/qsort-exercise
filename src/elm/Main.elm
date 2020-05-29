@@ -1,4 +1,4 @@
-module Main exposing
+port module Main exposing
   ( main
   )
 
@@ -7,8 +7,8 @@ import Browser
 import Browser.Dom
 import Browser.Navigation
 import Html
-import Http
 import Json.Decode
+import Json.Encode
 import Set
 import Task
 import Tuple.Extra
@@ -20,6 +20,12 @@ import Data.QSort exposing (QSort)
 import Pages.Info
 import Pages.Consent
 import Pages.QSort
+
+
+{- Ports -------------------------------------------------------------------- -}
+port toWebSocket : Json.Encode.Value -> Cmd msg
+port fromWebSocket : (Json.Decode.Value -> msg) -> Sub msg
+
 
 {- Main --------------------------------------------------------------------- -}
 main : Program Json.Decode.Value App Msg
@@ -120,6 +126,7 @@ type Msg
   | ItemSorted Int
   | StepForward
   | StepBackward
+  | ExternalUpdate QSort
 
 update : Msg -> App -> (App, Cmd Msg)
 update msg (page, key, model) =
@@ -180,35 +187,46 @@ update msg (page, key, model) =
       let
         m = { model | qsort = Data.QSort.select statement model.qsort }
       in
-      Tuple.pair (page, key, m) Cmd.none
+      Tuple.pair (page, key, m)
+        <| toWebSocket (Data.QSort.encode m.qsort)
 
     ItemRated rating ->
       let
         m = { model | qsort = Data.QSort.rate rating model.qsort }
       in
-      Tuple.pair (page, key, m) Cmd.none
+      Tuple.pair (page, key, m)
+        <| toWebSocket (Data.QSort.encode m.qsort)
 
     ItemSorted position ->
       let
         m = { model | qsort = Data.QSort.sort position model.qsort }
       in
-      Tuple.pair (page, key, m) Cmd.none
+      Tuple.pair (page, key, m)
+        <| toWebSocket (Data.QSort.encode m.qsort)
 
     StepForward ->
       let
         m = { model | qsort = Data.QSort.stepForward model.qsort }
       in
-      Tuple.pair (page, key, m)
-        <| Task.perform (\_ -> None)
-        <| Browser.Dom.setViewport 0 0
+      Tuple.pair (page, key, m) <| Cmd.batch
+        [ Task.perform (\_ -> None) <| Browser.Dom.setViewport 0 0
+        , toWebSocket (Data.QSort.encode m.qsort)
+        ]
 
     StepBackward ->
       let
         m = { model | qsort = Data.QSort.stepBackward model.qsort }
       in
-      Tuple.pair (page, key, m)
-        <| Task.perform (\_ -> None)
-        <| Browser.Dom.setViewport 0 0
+      Tuple.pair (page, key, m) <| Cmd.batch
+        [ Task.perform (\_ -> None) <| Browser.Dom.setViewport 0 0
+        , toWebSocket (Data.QSort.encode m.qsort)
+        ]
+
+    ExternalUpdate qsort ->
+      let
+        m = { model | qsort = qsort }
+      in
+      Tuple.pair (page, key, m) Cmd.none
 
 updatePage : Url -> Page
 updatePage { fragment } =
@@ -266,5 +284,9 @@ view (page, _, model) =
 subscriptions : App -> Sub Msg
 subscriptions _ =
   Sub.batch
-    [
+    [ fromWebSocket (
+        Json.Decode.decodeValue Data.QSort.decoder
+          >> Result.map ExternalUpdate
+          >> Result.withDefault None
+      )
     ]
